@@ -1,4 +1,4 @@
-FROM python:alpine3.13 AS compile-image
+FROM python:alpine3.14 AS compile-image
 
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
@@ -20,7 +20,7 @@ ADD . /httpbin
 RUN pip3 install --no-cache-dir /httpbin
 
 
-FROM python:alpine3.13
+FROM python:alpine3.14
 COPY --from=compile-image /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
