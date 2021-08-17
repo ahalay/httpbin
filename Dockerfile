@@ -1,7 +1,4 @@
-FROM python:alpine3.14 AS compile-image
-
-ENV LC_ALL=C.UTF-8
-ENV LANG=C.UTF-8
+FROM python:3-slim AS compile-image
 
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
@@ -9,18 +6,15 @@ ENV PATH="/opt/venv/bin:$PATH"
 ADD Pipfile Pipfile.lock /httpbin/
 WORKDIR /httpbin
 
-RUN apk update \ 
-    && apk add --no-cache --virtual .build-deps gcc build-base linux-headers ca-certificates python3-dev libffi-dev libressl-dev musl-dev git bash \
-    && pip install cffi \
+RUN apt update -y \ 
+    && apt install git gcc -y \
     && pip3 install --no-cache-dir pipenv \
-    && /bin/bash -c "pip3 install --no-cache-dir -r <(pipenv lock -r)" \
-    && apk del .build-deps
+    && /bin/bash -c "pip3 install --no-cache-dir -r <(pipenv lock -r)"
 
 ADD . /httpbin
 RUN pip3 install --no-cache-dir /httpbin
 
-
-FROM python:alpine3.14
+FROM python:3-slim
 COPY --from=compile-image /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
